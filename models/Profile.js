@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+mongoose.set('useFindAndModify', false);
+
 const ProfileSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -7,7 +9,7 @@ const ProfileSchema = new mongoose.Schema({
   },
   handle: {
     type: String,
-    required: true,
+    required: false,
     max: 40
   },
   company: {
