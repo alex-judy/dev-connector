@@ -88,9 +88,8 @@ router.post(
     if (instagram) profileFields.social.instagram = instagram;
 
     try {
-      let profile = Profile.findOne({ user: req.user.id });
+      let profile = await Profile.findOne({ user: req.user.id });
 
-      console.log(profile);
       if (profile) {
         // Update
         profile = await Profile.findOneAndUpdate(
@@ -98,7 +97,7 @@ router.post(
           { $set: profileFields },
           { new: true }
         );
-        return res.send(profile);
+        return res.json(profile);
       }
 
       // // Create if not found
