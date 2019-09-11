@@ -1,23 +1,22 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const config = require('config');
-const { check, validationResult } = require('express-validator/check');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const { check, validationResult } = require("express-validator/check");
 
-const User = require('../../models/User');
-const auth = require('../../middleware/auth');
+const User = require("../../models/User");
+const auth = require("../../middleware/auth");
 
 // @route   GET api/auth
 // @desc    Get user information with JWT
 // @access  Public
-router.get('/', auth, async (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(req.user.id).select("-password");
     res.json(user);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 });
 
@@ -25,10 +24,10 @@ router.get('/', auth, async (req, res) => {
 // @desc    Authenticate user and get token
 // @access  Public
 router.post(
-  '/',
+  "/",
   [
-    check('email', 'Please include a valid email.').isEmail(),
-    check('password', 'Password is required.').exists()
+    check("email", "Please include a valid email.").isEmail(),
+    check("password", "Password is required.").exists()
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -44,7 +43,7 @@ router.post(
       if (!user) {
         return res
           .status(400)
-          .json({ errors: [{ msg: 'Invalid Credentials' }] });
+          .json({ errors: [{ msg: "Invalid Credentials" }] });
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
@@ -52,7 +51,7 @@ router.post(
       if (!isMatch) {
         return res
           .status(400)
-          .json({ errors: [{ msg: 'Invalid Credentials' }] });
+          .json({ errors: [{ msg: "Invalid Credentials" }] });
       }
 
       const payload = {
@@ -63,9 +62,9 @@ router.post(
 
       jwt.sign(
         payload,
-        config.get('jwtSecret'),
+        process.env.JWT_SECRET,
         {
-          expiresIn: config.get('jwtExpiration')
+          expiresIn: process.env.JWT_EXPIRATION
         },
         (err, token) => {
           if (err) throw err;
@@ -74,7 +73,7 @@ router.post(
       );
     } catch (err) {
       console.error(err.message);
-      res.status(500).send('Server error');
+      res.status(500).send("Server error");
     }
   }
 );
